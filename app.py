@@ -96,7 +96,7 @@ def main():
     up = st.file_uploader("Chọn ảnh (JPG/PNG/JPEG)", type=["jpg","jpeg","png"])
     if up:
         img_bytes = up.read()
-        st.image(img_bytes, caption="Ảnh đầu vào", use_column_width=True)
+        st.image(img_bytes, caption="Ảnh đầu vào", use_container_width=True)
         if st.button("Nhận Diện Biển Số"):
             with st.spinner("Đang xử lý..."):
                 plates = gemini.extract_text_from_image(img_bytes)
