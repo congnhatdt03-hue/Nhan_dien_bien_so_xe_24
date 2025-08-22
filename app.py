@@ -108,7 +108,7 @@ def main():
                                    file_name="plates.txt", mime="text/plain")
             else:
                 st.error("Không nhận diện được biển số phù hợp.")
-   st.markdown(
+st.markdown(
     """
     <div style='position: fixed; bottom: 10px; right: 10px; font-size: 14px; color: gray;'>
         Đồ án II- GVHD: ThS. Nguyễn Thị Huế
