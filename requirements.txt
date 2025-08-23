@@ -1,7 +1,10 @@
 streamlit
 opencv-python
+numpy
 pillow
 ultralytics
 easyocr
 google-generativeai
-numpy
+moviepy
+torch
+torchvision
