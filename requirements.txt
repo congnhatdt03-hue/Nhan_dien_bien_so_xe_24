@@ -1,3 +1,7 @@
 streamlit
-google-generativeai
+opencv-python
 pillow
+ultralytics
+easyocr
+google-generativeai
+numpy
