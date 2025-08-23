@@ -14,7 +14,7 @@ from collections import Counter
 st.set_page_config(page_title="Nhận diện biển số xe", layout="wide")
 
 # ====== CONFIG ======
-YOLO_PATH = "/content/drive/MyDrive/đồ án 2/best.pt"
+YOLO_PATH = "best.pt"
 FRAME_STEP = 200  # ms
 CONFIDENCE_THRESHOLD = 0.25
 USE_EASYOCR_FALLBACK = True
