@@ -9,7 +9,7 @@ from ultralytics import YOLO
 import easyocr
 import tempfile
 from collections import Counter
-from moviepy.editor import VideoFileClip
+
 
 st.set_page_config(page_title="Nhận diện biển số xe", layout="wide")
 
