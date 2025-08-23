@@ -5,7 +5,7 @@ pillow
 ultralytics
 easyocr
 google-generativeai
-moviepy
+
 torch
 torchvision
 
