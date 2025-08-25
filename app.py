@@ -6,19 +6,19 @@ from PIL import Image
 import google.generativeai as genai
 import tempfile
 
-# Streamlit page config
-st.set_page_config(page_title="License Plate Recognition", layout="wide")
+# Cấu hình trang Streamlit
+st.set_page_config(page_title="Nhận Diện Biển Số Xe", layout="wide")
 
-# Gemini API configuration
-GEMINI_API_KEY = st.sidebar.text_input("Gemini API Key:", type="password")
+# Cấu hình Gemini API
+GEMINI_API_KEY = st.sidebar.text_input("🔑 Nhập Gemini API Key:", type="password")
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
     gemini_model = genai.GenerativeModel("gemini-1.5-flash")
 else:
-    st.error("Please enter a valid Gemini API Key.")
+    st.error("Vui lòng nhập Gemini API Key hợp lệ.")
     st.stop()
 
-# Regex for normalizing license plate
+# Regex chuẩn hóa biển số
 FALLBACK_REGEX = re.compile(r"(\d{2})\s*[- ]?\s*([A-Z]{1,2})\s*[- ]?\s*([0-9]{2,6})")
 def normalize_plate(text: str) -> str:
     text = text.upper().replace(" ", "").replace("-", "")
@@ -32,40 +32,52 @@ def normalize_plate(text: str) -> str:
         return f"{p1}-{p2} {p3}"
     return text
 
-# OCR with Gemini
+# OCR với Gemini
 def ocr_with_gemini(image: Image.Image) -> str:
     try:
-        prompt = "Extract the license plate number from the image (return only the license plate number, no extra characters):"
+        prompt = "Đọc biển số xe trong ảnh (chỉ trả về biển số, không thêm ký tự nào khác):"
         res = gemini_model.generate_content([prompt, image])
         return normalize_plate(res.text.strip())
     except Exception as e:
         return ""
 
-# Minimalist UI
-st.title("License Plate Recognition")
-input_type = st.radio("Input Type:", ["Image", "Video"], horizontal=True)
-uploaded_file = st.file_uploader("Upload File", type=["jpg", "jpeg", "png", "mp4", "mov", "avi"])
+# Giao diện tối giản
+st.title("🚗 Nhận Diện Biển Số Xe")
+input_type = st.radio("Loại dữ liệu:", ["Ảnh", "Video"], horizontal=True)
+uploaded_file = st.file_uploader("📤 Tải lên ảnh hoặc video", type=["jpg", "jpeg", "png", "mp4", "mov", "avi"])
 
-if uploaded_file and st.button("Process"):
+# Xem trước file tải lên
+if uploaded_file:
+    st.subheader("📎 Xem trước")
+    if input_type == "Ảnh":
+        file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
+        image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+        st.image(image, channels="BGR", caption="Ảnh đã tải lên")
+        uploaded_file.seek(0)  # Reset con trỏ file để xử lý tiếp
+    else:
+        st.video(uploaded_file)
+        uploaded_file.seek(0)  # Reset con trỏ file để xử lý tiếp
+
+# Xử lý nhận diện
+if uploaded_file and st.button("🚀 Xử lý"):
     plates = []
 
-    if input_type == "Image":
+    if input_type == "Ảnh":
         file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
         image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
         pil_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
         text = ocr_with_gemini(pil_image)
         if text:
             plates.append(text)
-            st.image(image, channels="BGR", caption="Processed Image")
         else:
-            st.warning("No license plate detected.")
+            st.warning("❌ Không phát hiện biển số.")
 
     else:
         temp_video = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
         temp_video.write(uploaded_file.read())
         cap = cv2.VideoCapture(temp_video.name)
         fps = cap.get(cv2.CAP_PROP_FPS)
-        frame_interval = int(fps * 0.5)  # Process every 0.5 seconds
+        frame_interval = int(fps * 0.5)  # Xử lý mỗi 0.5 giây
         frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         pbar = st.progress(0.0)
         idx = 0
@@ -83,12 +95,11 @@ if uploaded_file and st.button("Process"):
             pbar.progress(min(idx / frames, 1.0))
         cap.release()
         os.unlink(temp_video.name)
-        st.video(uploaded_file)
 
-    # Display results
+    # Hiển thị kết quả
+    st.subheader("📋 Kết quả nhận diện")
     if plates:
-        st.subheader("Detected License Plates:")
         for plate in set(plates):
-            st.write(f"- {plate} ({plates.count(plate)} times)")
+            st.write(f"- **{plate}** ({plates.count(plate)} lần)")
     else:
-        st.warning("No license plates detected.")
+        st.warning("❌ Không phát hiện biển số.")
