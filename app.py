@@ -84,6 +84,13 @@ if uploaded_file:
 
 # Xử lý nhận diện
 if uploaded_file and st.button("🚀 Xử lý"):
+    # Hiển thị thông báo trạng thái xử lý
+    status_placeholder = st.empty()
+    if gemini_model:
+        status_placeholder.info("Đang xử lý bằng Gemini API...")
+    else:
+        status_placeholder.info("Đang xử lý bằng EasyOCR...")
+
     plates = []
 
     if input_type == "Ảnh":
@@ -125,6 +132,18 @@ if uploaded_file and st.button("🚀 Xử lý"):
             pbar.progress(min(idx / frames, 1.0))
         cap.release()
         os.unlink(temp_video.name)
+
+    # Xóa thông báo trạng thái
+    status_placeholder.empty()
+# ===== GHI CHÚ =====
+    st.markdown(
+        """
+        <div style='position: fixed; bottom: 10px; right: 10px; font-size: 14px; color: gray;'>
+           By Võ Công Nhật-20222627.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     # Hiển thị kết quả
     st.subheader("📋 Kết quả nhận diện")
