@@ -7,7 +7,7 @@ import google.generativeai as genai
 import tempfile
 import easyocr
 import os
-
+sed -i 's/\xC2\xA0/ /g' app.py
 # Cấu hình trang Streamlit
 st.set_page_config(page_title="Nhận Diện Biển Số Xe", layout="wide")
 
